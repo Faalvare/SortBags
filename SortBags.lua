@@ -8,6 +8,20 @@ local function IsPlayingOnTurtleWoW()
 	return TargetHPText ~= nil and TargetHPPercText ~= nil
 end
 
+local function IsSuperWoWLoaded()
+	-- https://github.com/balakethelock/SuperWoW/wiki/Features
+	return SetAutoloot ~= nil
+end
+
+local function GetContainerItemCount(container, position)
+	local _, countOrCharges = GetContainerItemInfo(container, position)
+	local count = countOrCharges
+	if IsSuperWoWLoaded() and countOrCharges < 0 then
+		count = 1
+	end
+	return count
+end
+
 local CONTAINERS
 
 function _G.SortBags()
@@ -333,7 +347,7 @@ do
 				local slot = {container=container, position=position, class=class}
 				local item = Item(container, position)
 				if item then
-					local _, count = GetContainerItemInfo(container, position)
+					local count = GetContainerItemCount(container, position)
 					slot.item = item
 					slot.count = count
 					counts[item] = (counts[item] or 0) + count
